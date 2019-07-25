@@ -1,0 +1,124 @@
+ROOT_DIR:=lzo-2.10
+SRC_ROOT:=$(ROOT_DIR)/src
+INCLUDES_ROOT:=$(ROOT_DIR)/include
+
+SNAME:=$(ROOT_DIR)/liblzo2.a
+CFLAGS:= -I$(INCLUDES_ROOT)
+LDFLAGS:=
+
+BUILD_ROOT:=build
+BUILD_TARGENT_PATH:=$(BUILD_ROOT)/lib/liblzo2.a
+BUILD_INCLUDE_PATH:=$(BUILD_ROOT)/include/lzo
+
+INCLUDES:= \
+    $(INCLUDES_ROOT)/lzo/lzo1.h \
+    $(INCLUDES_ROOT)/lzo/lzo1a.h \
+    $(INCLUDES_ROOT)/lzo/lzo1b.h \
+    $(INCLUDES_ROOT)/lzo/lzo1c.h \
+    $(INCLUDES_ROOT)/lzo/lzo1f.h \
+    $(INCLUDES_ROOT)/lzo/lzo1x.h \
+    $(INCLUDES_ROOT)/lzo/lzo1y.h \
+    $(INCLUDES_ROOT)/lzo/lzo1z.h \
+    $(INCLUDES_ROOT)/lzo/lzo2a.h \
+    $(INCLUDES_ROOT)/lzo/lzo_asm.h \
+    $(INCLUDES_ROOT)/lzo/lzoconf.h \
+    $(INCLUDES_ROOT)/lzo/lzodefs.h \
+    $(INCLUDES_ROOT)/lzo/lzoutil.h \
+
+SRC += \
+	$(SRC_ROOT)/lzo1.c \
+    $(SRC_ROOT)/lzo1_99.c \
+    $(SRC_ROOT)/lzo1a.c \
+    $(SRC_ROOT)/lzo1a_99.c \
+    $(SRC_ROOT)/lzo1b_1.c \
+    $(SRC_ROOT)/lzo1b_2.c \
+    $(SRC_ROOT)/lzo1b_3.c \
+    $(SRC_ROOT)/lzo1b_4.c \
+    $(SRC_ROOT)/lzo1b_5.c \
+    $(SRC_ROOT)/lzo1b_6.c \
+    $(SRC_ROOT)/lzo1b_7.c \
+    $(SRC_ROOT)/lzo1b_8.c \
+    $(SRC_ROOT)/lzo1b_9.c \
+    $(SRC_ROOT)/lzo1b_99.c \
+    $(SRC_ROOT)/lzo1b_9x.c \
+    $(SRC_ROOT)/lzo1b_cc.c \
+    $(SRC_ROOT)/lzo1b_d1.c \
+    $(SRC_ROOT)/lzo1b_d2.c \
+    $(SRC_ROOT)/lzo1b_rr.c \
+    $(SRC_ROOT)/lzo1b_xx.c \
+    $(SRC_ROOT)/lzo1c_1.c \
+    $(SRC_ROOT)/lzo1c_2.c \
+    $(SRC_ROOT)/lzo1c_3.c \
+    $(SRC_ROOT)/lzo1c_4.c \
+    $(SRC_ROOT)/lzo1c_5.c \
+    $(SRC_ROOT)/lzo1c_6.c \
+    $(SRC_ROOT)/lzo1c_7.c \
+    $(SRC_ROOT)/lzo1c_8.c \
+    $(SRC_ROOT)/lzo1c_9.c \
+    $(SRC_ROOT)/lzo1c_99.c \
+    $(SRC_ROOT)/lzo1c_9x.c \
+    $(SRC_ROOT)/lzo1c_cc.c \
+    $(SRC_ROOT)/lzo1c_d1.c \
+    $(SRC_ROOT)/lzo1c_d2.c \
+    $(SRC_ROOT)/lzo1c_rr.c \
+    $(SRC_ROOT)/lzo1c_xx.c \
+    $(SRC_ROOT)/lzo1f_1.c \
+    $(SRC_ROOT)/lzo1f_9x.c \
+    $(SRC_ROOT)/lzo1f_d1.c \
+    $(SRC_ROOT)/lzo1f_d2.c \
+    $(SRC_ROOT)/lzo1x_1.c \
+    $(SRC_ROOT)/lzo1x_1k.c \
+    $(SRC_ROOT)/lzo1x_1l.c \
+    $(SRC_ROOT)/lzo1x_1o.c \
+    $(SRC_ROOT)/lzo1x_9x.c \
+    $(SRC_ROOT)/lzo1x_d1.c \
+    $(SRC_ROOT)/lzo1x_d2.c \
+    $(SRC_ROOT)/lzo1x_d3.c \
+    $(SRC_ROOT)/lzo1x_o.c \
+    $(SRC_ROOT)/lzo1y_1.c \
+    $(SRC_ROOT)/lzo1y_9x.c \
+    $(SRC_ROOT)/lzo1y_d1.c \
+    $(SRC_ROOT)/lzo1y_d2.c \
+    $(SRC_ROOT)/lzo1y_d3.c \
+    $(SRC_ROOT)/lzo1y_o.c \
+    $(SRC_ROOT)/lzo1z_9x.c \
+    $(SRC_ROOT)/lzo1z_d1.c \
+    $(SRC_ROOT)/lzo1z_d2.c \
+    $(SRC_ROOT)/lzo1z_d3.c \
+    $(SRC_ROOT)/lzo2a_9x.c \
+    $(SRC_ROOT)/lzo2a_d1.c \
+    $(SRC_ROOT)/lzo2a_d2.c \
+    $(SRC_ROOT)/lzo_crc.c \
+    $(SRC_ROOT)/lzo_init.c \
+    $(SRC_ROOT)/lzo_ptr.c \
+    $(SRC_ROOT)/lzo_str.c \
+    $(SRC_ROOT)/lzo_util.c
+
+OBJS += $(SRC:.c=.o)
+
+all: $(SNAME)
+
+$(TARGET): $(OBJS) $(INCLUDES)
+	$(CC) ${LDFLAGS} -o $@ $^
+
+$(SNAME): $(OBJS) $(INCLUDES)
+	$(AR) $(ARFLAGS) $@ $^
+
+$(SRCS:.c=.d):%.d:%.c
+	$(CC) $(CFLAGS) -MM $< >$@
+
+include $(SRCS:.c=.d)
+
+.PHONY: clean install uninstall
+
+clean:
+	-${RM} ${TARGET} ${OBJS}
+
+install: $(SNAME)
+	mkdir -p $(BUILD_INCLUDE_PATH)
+	mkdir -p $(BUILD_ROOT)/lib/
+	cp $(INCLUDES) $(BUILD_INCLUDE_PATH)
+	cp $(SNAME) $(BUILD_TARGENT_PATH)
+
+uninstall:
+	-${RM} $(BUILD_TARGENT_PATH) $(addprefix $(BUILD_INCLUDE_PATH)/,$(notdir $(INCLUDES)))

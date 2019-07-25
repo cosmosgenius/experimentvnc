@@ -1,0 +1,12 @@
+.theos
+obj
+packages
+experimentvnc
+vnc-build
+libpng-build
+libjpeg-build
+build
+.libs
+.deps
+*.o
+*.a

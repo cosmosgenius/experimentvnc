@@ -1,0 +1,79 @@
+ROOT_DIR:=libpng-1.6.36
+SRC_ROOT:=$(ROOT_DIR)
+INCLUDES_ROOT:=$(ROOT_DIR)
+
+SNAME:=$(ROOT_DIR)/libpng.a
+CFLAGS:= -I$(INCLUDES_ROOT)
+LDFLAGS:=
+
+BUILD_ROOT:=build
+BUILD_TARGENT_PATH:=$(BUILD_ROOT)/lib/libpng.a
+BUILD_INCLUDE_PATH:=$(BUILD_ROOT)/include
+
+LOCAL_INCLUDES:= \
+	png.h \
+	pngconf.h \
+	pnglibconf.h
+
+INCLUDES:= \
+	$(addprefix $(ROOT_DIR)/, $(LOCAL_INCLUDES))
+
+LOCAL_SRC += \
+    png.c \
+	pngerror.c \
+	pngget.c \
+	pngmem.c \
+	pngpread.c \
+	pngread.c \
+	pngrio.c \
+	pngrtran.c \
+	pngrutil.c \
+	pngset.c \
+	pngtrans.c \
+	pngwio.c \
+	pngwrite.c \
+	pngwtran.c \
+	pngwutil.c
+
+LOCAL_ARM_SRC += \
+	arm/arm_init.c \
+	arm/filter_neon.S \
+	arm/filter_neon_intrinsics.c \
+	arm/palette_neon_intrinsics.c
+
+LOCAL_INTEL_SRC += \
+	intel/intel_init.c \
+	intel/filter_sse2_intrinsics.c
+
+SRC += \
+	$(addprefix $(SRC_ROOT)/, $(LOCAL_SRC))\
+	$(addprefix $(SRC_ROOT)/, $(LOCAL_INTEL_SRC))
+
+OBJS += $(SRC:.c=.o)
+
+all: $(SNAME)
+
+$(TARGET): $(OBJS) $(INCLUDES)
+	$(CC) ${LDFLAGS} -o $@ $^
+
+$(SNAME): $(OBJS) $(INCLUDES)
+	$(AR) $(ARFLAGS) $@ $^
+
+$(SRCS:.c=.d):%.d:%.c
+	$(CC) $(CFLAGS) -MM $< >$@
+
+include $(SRCS:.c=.d)
+
+.PHONY: clean install uninstall
+
+clean:
+	-${RM} ${TARGET} ${OBJS}
+
+install: $(SNAME)
+	mkdir -p $(BUILD_INCLUDE_PATH)
+	mkdir -p $(BUILD_ROOT)/lib/
+	cp $(INCLUDES) $(BUILD_INCLUDE_PATH)
+	cp $(SNAME) $(BUILD_TARGENT_PATH)
+
+uninstall:
+	-${RM} $(BUILD_TARGENT_PATH) $(addprefix $(BUILD_INCLUDE_PATH)/,$(notdir $(INCLUDES)))
